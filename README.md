@@ -183,6 +183,26 @@ Once the firewall has been provisioned, there are 2 things that should be done:
 The logs, when generated should now be visible in the *Logs* menu of the firewall **BUT** as we are not yet directing traffic to the firewall, then there will not be any logs for now.
 
 #### Whitelist target addresses
+By default, the firewall (once we set it up to accept requests - in the following steps) will block requests. So we need to whitelist the ACI-hosted web application and potentially some public web sites as a secondary test.
+
+1. Whitelisting can either be done in the *Application rule collection* or the *Network rule collection*
+2. For the ACI-hosted application, we will add this into the network rule collection:
+
+![alt text](images/firewall-network-rule-overview.png "firewall provisioning")
+![alt text](images/firewall-network-rule-settings.png "firewall provisioning")
+
+As can be seen from above, we are allowing requests from 10.2.0.0/24 - whioch is the application gateway subnet's IP address range to the private IP address of the ACI-hosted web app (10.3.2.4 on port 80).
+
+3. For some external web sites to aid testing, here are some application rules:
+
+![alt text](images/firewall-application-rule-overview.png "firewall provisioning")
+![alt text](images/firewall-application-rule-settings.png "firewall provisioning")
+
+This should have the firewall configured. Nothing to see so far, because we have not configured network routing to push request to the firewall. Thats the next step.
+
+
+## Setup network routing
+
 
 
 
