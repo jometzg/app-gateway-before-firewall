@@ -9,7 +9,7 @@ The rest of this is a worked example of this pattern so you can see what needs t
 
 ## The Example Environment
 
-![alt text](images/App-gateway-before-firewall-sample.png "Logical diagram")
+![alt text](images/App-gateway-before-firewall-sample2.png "Logical diagram")
 
 In this sample, we are considering private users needing to access some form of web service on a spoke VNet. This can be any web service hosted in a VM, App Service, Kubernetes etc. But in the case of this exmample, it is a simple Azure Container Instances (ACI) sample app that is hosted in the *aci* subnet of the *spokevnet* VNet. The application gateway is to be configured as listening only on its private IP address and so to test this, there is a Linux VM which is in the same VNet as the application gateway - but a different subnet. The VNets are peered so that requests from the *dmzvnet* VNet can get routed to the ACI-hosted web app in the *spokevnet*.
 
