@@ -313,5 +313,8 @@ Action: Deny. Reason: No rule matched. Proceeding with default action
 ![alt text](images/firewall-application-log.png "Firewall application log")
 
 
+# Summary
+Application gateway when used with Azure Firewall in the application gateway before firewall pattern needs a pair of Route tables (UDRs) to work correctly. In addition, the Route table associated with the application gateway subnet cannot use the catch-all route of 0.0.0.0/0 and must use a more selective one to target the address ranges of your *backend* workloads. You must also not forget to put a Route table (UDR) on the backend subnets, otherwise asymmetric routing may happen.
 
+The use of a jump box to drive requests and log analytics to validate that requests are going via the firewall is important in being able to debug this scenario.
 
