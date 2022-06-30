@@ -189,21 +189,31 @@ By default, the firewall (once we set it up to accept requests - in the followin
 2. For the ACI-hosted application, we will add this into the network rule collection:
 
 ![alt text](images/firewall-network-rule-overview.png "firewall provisioning")
-![alt text](images/firewall-network-rule-settings.png "firewall provisioning")
+![alt text](images/firewall-network-rule-setting.png "firewall provisioning")
 
 As can be seen from above, we are allowing requests from 10.2.0.0/24 - whioch is the application gateway subnet's IP address range to the private IP address of the ACI-hosted web app (10.3.2.4 on port 80).
 
 3. For some external web sites to aid testing, here are some application rules:
 
 ![alt text](images/firewall-application-rule-overview.png "firewall provisioning")
-![alt text](images/firewall-application-rule-settings.png "firewall provisioning")
+![alt text](images/firewall-application-rule-setting.png "firewall provisioning")
 
 This should have the firewall configured. Nothing to see so far, because we have not configured network routing to push request to the firewall. Thats the next step.
 
 
 ## Setup network routing
 
+This step is the heart of the matter and it is key to undertand one thing first.
 
+Application gateway V2 does not like route table rules that force all traffic to a firewall. Doing creates difficulty for all of the probes and management traffic, so more care needs to be taken.
+
+This is documented here https://docs.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#supported-user-defined-routes
+
+>v2 unsupported scenarios
+>
+?Scenario 1: UDR for Virtual Appliances
+>
+>Any scenario where 0.0.0.0/0 needs to be redirected through any virtual appliance, a hub/spoke virtual network, or on-premises (forced tunneling) isn't supported for V2.
 
 
 
