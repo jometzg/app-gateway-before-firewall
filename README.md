@@ -154,6 +154,39 @@ Once the configuration is correct, you should see good backend health
 
 **Only once you are sure that the application gateway works and that you can access the ACI-hosted web application from the application gateway's private IP address move to the next step.**
 
-## Integrate with Azure Firewall for the full application gateway before firewall pattern
+## Sample with the full application gateway before firewall pattern
+
+In this section, we are going to provision an Azure firewall and route requests to this from the application gateway.
+
+### Create an Azure Firewall
+1. In your *dmzvnet* check that you have a subnet *AzureFirewallSubnet* - create this if not already there.
+2. Create the fireall in the same region as everything else, name it, choose the standard tier and "Use Firewall rules (classic) to manage this firewall* (this just makes it easier to administer firewall rules), then choose your dmzvnet which will only work if there is the AzureFirewallSubnet and then create a new public IP address for the firewall. The configuration should look like below:
+
+![alt text](images/firewall-provisioning.png "firewall provisioning")
+
+It will take some time for the firewall to provision.
+
+### Configure Firewall
+Once the firewall has been provisioned, there are 2 things that should be done:
+1. Enable diagnostics so that we can see the logs generated
+2. Enable some target addresses. By default, the firewall will block, so for it to allow traffic to our ACI-hosted web app, we must whitelist it's address
+
+#### Enable diagnostics
+1. Go to the firewall and choose the *Diagnostic Settings* menu
+
+![alt text](images/firewall-enable-diagnostics.png "firewall provisioning")
+
+2. Choose *Add diagnostic settings*, choose all of the logs and then point this to a log analytics workspace in the same region as the firewall (there is usually one) and then hit *Save*
+
+![alt text](images/firewall-diagnostics-settings.png "firewall provisioning")
+
+The logs, when generated should now be visible in the *Logs* menu of the firewall **BUT** as we are not yet directing traffic to the firewall, then there will not be any logs for now.
+
+#### Whitelist target addresses
+
+
+
+
+
 
 
