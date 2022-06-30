@@ -211,11 +211,106 @@ This is documented here https://docs.microsoft.com/en-us/azure/application-gatew
 
 >v2 unsupported scenarios
 >
-?Scenario 1: UDR for Virtual Appliances
+>Scenario 1: UDR for Virtual Appliances
 >
 >Any scenario where 0.0.0.0/0 needs to be redirected through any virtual appliance, a hub/spoke virtual network, or on-premises (forced tunneling) isn't supported for V2.
 
+So, we need to be more selective on the routing rule that gets associated with the application gateway subnet and only target the an address range of our target endpoint(s) - in our case the subnet *aci* in the *spokevnet* VNet.
 
+### App gateway Route table
+Here is our Route table (AKA UDR) setting:
+![alt text](images/app-gateway-udr2.png "app gateway Route table")
+
+In the above, IP addresses targeted to the ACI-hosted web app's VNet in a range of 10.3.0.0/16 are routed to the Azure Firewall's private IP address. We could have chosen the specific subnet's address range.
+
+The route table is then associated with the *gateway* subnet of the *dmzvnet* VNet.
+
+This only solves half of our problem. If we look at the flows in the diagram below
+
+![alt text](images/routing-table-partial-flow.png "app gateway flows")
+
+In this diagram, this only takes care of the highlighted flows marked 1, 2, 3. In order to get responses back from the ACI-hosted web app, we need a second route table (highlighted in red above) associated with the ACI's subnet.
+
+### Target service route table
+We now need to take care of the return flows from the diagram above and to do this we need another route table (UDR) that is associated with the subnet that the ACI-hosted web app lives in. This needs to take care of the return flows:
+
+![alt text](images/aci-udr.png "Route table on aci")
+
+In the above, the route table is associated with the *aci* subnet in the *spokevnet* and has two routes:
+1. A route back to the application gateway's subnet (in our case 10.2.0.0/24) - these are flows 4 and 5
+2. An outbound route that allows the firewall to inspect potential outbound requests from the app(s) in the *aci* subnet 
+
+If these configurations are set corectly, then you should see:
+1. Curl requests from our jump VM to the application gateway private IP address 10.2.0.4 will result in HTML
+2. We should also see the firewall log of the network rule allowing that request - this will confirm that requests are being routed to the firewall and that the firewall is allowing them.
+
+There are some sample network rule log queries
+
+```
+// Network rule log data 
+// Parses the network rule log data. 
+AzureDiagnostics
+| where Category == "AzureFirewallNetworkRule"
+| where OperationName == "AzureFirewallNatRuleLog" or OperationName == "AzureFirewallNetworkRuleLog"
+//case 1: for records that look like this:
+//PROTO request from IP:PORT to IP:PORT.
+| parse msg_s with Protocol " request from " SourceIP ":" SourcePortInt:int " to " TargetIP ":" TargetPortInt:int *
+//case 1a: for regular network rules
+| parse kind=regex flags=U msg_s with * ". Action\\: " Action1a "\\."
+//case 1b: for NAT rules
+//TCP request from IP:PORT to IP:PORT was DNAT'ed to IP:PORT
+| parse msg_s with * " was " Action1b:string " to " TranslatedDestination:string ":" TranslatedPort:int *
+//Parse rule data if present
+| parse msg_s with * ". Policy: " Policy ". Rule Collection Group: " RuleCollectionGroup "." *
+| parse msg_s with * " Rule Collection: "  RuleCollection ". Rule: " Rule 
+//case 2: for ICMP records
+//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow
+| parse msg_s with Protocol2 " request from " SourceIP2 " to " TargetIP2 ". Action: " Action2
+| extend
+SourcePort = tostring(SourcePortInt),
+TargetPort = tostring(TargetPortInt)
+| extend 
+    Action = case(Action1a == "", case(Action1b == "",Action2,Action1b), split(Action1a,".")[0]),
+    Protocol = case(Protocol == "", Protocol2, Protocol),
+    SourceIP = case(SourceIP == "", SourceIP2, SourceIP),
+    TargetIP = case(TargetIP == "", TargetIP2, TargetIP),
+    //ICMP records don't have port information
+    SourcePort = case(SourcePort == "", "N/A", SourcePort),
+    TargetPort = case(TargetPort == "", "N/A", TargetPort),
+    //Regular network rules don't have a DNAT destination
+    TranslatedDestination = case(TranslatedDestination == "", "N/A", TranslatedDestination), 
+    TranslatedPort = case(isnull(TranslatedPort), "N/A", tostring(TranslatedPort)),
+    //Rule information
+    Policy = case(Policy == "", "N/A", Policy),
+    RuleCollectionGroup = case(RuleCollectionGroup == "", "N/A", RuleCollectionGroup ),
+    RuleCollection = case(RuleCollection == "", "N/A", RuleCollection ),
+    Rule = case(Rule == "", "N/A", Rule)
+| project TimeGenerated, msg_s, Protocol, SourceIP,SourcePort,TargetIP,TargetPort,Action, TranslatedDestination, TranslatedPort, Policy, RuleCollectionGroup, RuleCollection, Rule
+```
+
+![alt text](images/firewall-network-log.png "Firewall network log")
+
+You can see the allow responses.
+
+We can also experiment with testing other whilelisted and non-whitelisted external addresses:
+
+```
+curl ifconfig.co
+curl www.google.co.uk
+```
+
+These return good responses
+
+But this reqwuest:
+```
+curl facebook.com
+```
+
+Returns:
+azureadmin@routetest:~$ curl facebook.com
+Action: Deny. Reason: No rule matched. Proceeding with default action
+
+![alt text](images/firewall-application-log.png "Firewall application log")
 
 
 
