@@ -17,3 +17,8 @@ Without any firewall or network routing configured, the environment looks like t
 
 ![alt text](images/App-gateway-before-firewall-no-routing.png "Logical diagram")
 
+So, in the test VM
+```
+curl 10.2.0.4
+```
+will result in a repsonse from the test app because we have configured application to use the ACI web application as its backend and we are sending the request to the private IP address of the application gateway (10.2.0.4)
