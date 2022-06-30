@@ -207,7 +207,7 @@ This step is the heart of the matter and it is key to undertand one thing first.
 
 Application gateway V2 does not like route table rules that force all traffic to a firewall. Doing creates difficulty for all of the probes and management traffic, so more care needs to be taken.
 
-This is documented here https://docs.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#supported-user-defined-routes
+This is documented [here] (https://docs.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#supported-user-defined-routes)
 
 >v2 unsupported scenarios
 >
