@@ -48,7 +48,7 @@ This should result in a web app that is only visible in VNets and will have a pr
 
 Your result ACI overview should look like this:
 ![alt text](images/aci-settings.png "ACI overview")
-Note its private IP address.
+Note its private IP address (highlighted).
 
 
 ### Jump box to test private App Gateway endpoint
@@ -69,6 +69,23 @@ Once this has provisioned, open a shell into the VM:
 curl 10.3.2.4
 ```
 Should result in the HTML of the container app. If this does not work, check the IP address of your container.
+```
+<html>
+<head>
+  <title>Welcome to Azure Container Instances!</title>
+</head>
+<style>
+h1 {
+    color: darkblue;
+    font-family:arial, sans-serif;
+    font-weight: lighter;
+} 
+</style>
 
+<body>
+
+<div align="center">
+<h1>Welcome to Azure Container Instances!</h1>
+```
 
 ### Application gateway configuration
