@@ -111,3 +111,49 @@ Finally there is a configuration summary, which should look something like this:
 ![alt text](images/App-gateway-configuration.png "Configuiration summary")
 
 9. Then go past tags, and review and create and finally press *Create*. This step will take some minutes
+
+
+### Testing application gateway configuration
+The testing is exaclty like the previous testing of the ACI-hosted web application, except that in the jumpbox VM we will use the private IP address of the application gateway.
+
+```
+curl 10.2.0.4
+```
+Should result in the HTML of the container app. If this does not work, check the IP address of your container.
+```
+<html>
+<head>
+  <title>Welcome to Azure Container Instances!</title>
+</head>
+<style>
+h1 {
+    color: darkblue;
+    font-family:arial, sans-serif;
+    font-weight: lighter;
+} 
+</style>
+
+<body>
+
+<div align="center">
+<h1>Welcome to Azure Container Instances!</h1>
+
+....
+
+```
+
+If this does not work, the some troubleshooting of the application gateway is necessary. The best place to start is the *Backend Health" section of the applciation gateway:
+
+![alt text](images/app-gateway-backend-health.png "backend health")
+
+If, like the above, you see an error, this needs to be addressed. Check the backend settings again - the port and then the IP address in the backend pool.
+
+Once the configuration is correct, you should see good backend health
+
+![alt text](images/app-gateway-backend-health-good.png "backend health")
+
+**Only once you are sure that the application gateway works and that you can access the ACI-hosted web application from the application gateway's private IP address move to the next step.**
+
+## Integrate with Azure Firewall for the full application gateway before firewall pattern
+
+
