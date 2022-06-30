@@ -108,6 +108,6 @@ So, no we are going to introduce the application gateway. This needs to be the v
 ![alt text](images/app-gateway-backend-target.png "Backend target")
 
 Finally there is a configuration summary, which should look something like this:
-![alt text](images/app-gateway-configuration.png "Configuiration summary")
+![alt text](images/App-gateway-configuration.png "Configuiration summary")
 
 9. Then go past tags, and review and create and finally press *Create*. This step will take some minutes
