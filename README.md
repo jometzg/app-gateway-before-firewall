@@ -86,6 +86,28 @@ h1 {
 
 <div align="center">
 <h1>Welcome to Azure Container Instances!</h1>
+
+....
+
 ```
 
 ### Application gateway configuration
+So, no we are going to introduce the application gateway. This needs to be the v2 SKU and you can either choose *Standard V2*  or *WAF V2* . As we are not going to edit WAF rules, the *Standard v2*  SKU should work.
+
+1. Create an application gateway
+2. Choose Standard V2 as the tier
+3. Associate it with your *dmzvnet* with the *gateway* subnet
+4. In frontends choose *both* for Frontend IP address type
+5. Create a new public IP address (we won't use this, but it is required)
+6. For private IP addresses, you need to set *Yes* for Use specific IP address and then if you have used the same addresses as this sample, then put in 10.2.0.4 (but this needs to be in the address range of your *gateway* subnet)
+7. In backends, you need to "Add a backend pool", with a target IP address of your ACI-hosted web app. In my sample it is 10.3.2.4
+8. In configuration, you need to add a routing rule, this has several steps where you need to add a listener and a backend target
+
+![alt text](images/app-gateway-routing-rule.png "Routing Rule")
+![alt text](images/app-gateway-backend-setting.png "Backend setting")
+![alt text](images/app-gateway-backend-target.png "Backend target")
+
+Finally there is a configuration summary, which should look something like this:
+![alt text](images/app-gateway-configuration.png "Configuiration summary")
+
+9. Then go past tags, and review and create and finally press *Create*. This step will take some minutes
