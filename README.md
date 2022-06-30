@@ -15,7 +15,7 @@ In this sample, we are considering private users needing to access some form of 
 
 Without any firewall or network routing configured, the environment looks like this:
 
-![alt text](images/App-gateway-before-firewall-no-routing.png "Logical diagram")
+![alt text](images/App-gateway-before-firewall-no-routing2.png "Logical diagram")
 
 So, in the test VM
 ```
