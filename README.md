@@ -5,7 +5,7 @@ There are some circumstances where a workload needs to be protected by both a We
 
 > ![alt text](images/design4_500.png "Logical diagram")
 
-** Please be aware of the GDPR implications of logging of any data that is customer identifying, such as their inbound IP address https://www.privacy-regulation.eu/en/r30.htm ** 
+**Please be aware of the GDPR implications of logging of any data that is customer identifying, such as their inbound IP address https://www.privacy-regulation.eu/en/r30.htm** 
 
 
 The rest of this is a worked example of this pattern so you can see what needs to be configured and why.
